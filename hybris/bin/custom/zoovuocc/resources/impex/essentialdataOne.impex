@@ -1,0 +1,35 @@
+
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; ZoovuProduct; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; ZoovuProduct  ; Catalog              ; Catalog
+; ZoovuProduct  ; CatalogVersion       ; CatalogVersion
+; ZoovuProduct  ; Product              ; Product
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; ZoovuProduct:Catalog              ; id                      ; Catalog:id                      ;
+; ZoovuProduct:CatalogVersion       ; catalog                 ; CatalogVersion:catalog          ; ZoovuProduct:Catalog
+; ZoovuProduct:CatalogVersion       ; version                 ; CatalogVersion:version          ;
+; ZoovuProduct:Product              ; code                    ; Product:code                    ;
+; ZoovuProduct:Product              ; catalogVersion          ; Product:catalogVersion          ; ZoovuProduct:CatalogVersion
+; ZoovuProduct:Product              ; name                    ; Product:name                    ;
+
+INSERT_UPDATE InboundChannelConfiguration; integrationObject(code)[unique = true]; authenticationType(code);
+                                         ; ZoovuProduct                          ; OAUTH                   ;
+
+INSERT_UPDATE IntegrationClientCredentialsDetails; clientId[unique = true]; resourceIds; authorities                ; clientSecret       ; registeredRedirectUri                           ; user(uid)        ;
+                                                 ; zoovuOauthClient       ; hybris     ; ROLE_INTEGRATIONADMINGROUP ; userpassword       ; https://localhost:9002/oauth2_implicit_callback ; zoovuOauthUser   ;
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true]    ;resourceIds       ;scope        ;authorizedGrantTypes                                            ;authorities             ;clientSecret    ;registeredRedirectUri
+								;zoovuClient           ;hybris            ;extended     ;authorization_code,refresh_token,password,client_credentials    ;ROLE_TRUSTED_CLIENT     ;1234;         ;
+
+#
+#
+#
+#$START_USERRIGHTS
+#			Type        ;UID        ;MemberOfGroups;Password;Target;read;change;create;delete;change_perm
+#			UserGroup   ;impexgroup ;integrationadmingroup ;
+#			;;;;Product;+;+;+;+;+
+#			Employee;zoovuReader;impexgroup;1234;
+#			$END_USERRIGHTS
